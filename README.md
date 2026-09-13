@@ -8,6 +8,7 @@ Projektet är uppdelat i:
 - Locust-skriptet som simulera samtidiga användare som loggar in i applikationen.
 - Databasen med användarens uppgifter, som används både av applikationen och Locust-skriptet.
 
+## Sekvensdiagram för projektet
 ![sekvensdiagram](sekvensdiagram.png)
 
 ## Login-app
