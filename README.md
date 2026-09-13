@@ -1,5 +1,5 @@
 # Beskrivning
-Detta projekt har skapats för kursen PYXXX på BTH. Syftet är att modellera de väntetider som en användare kan uppleva då många samtidiga användare kan logga in, och var dessa väntetider kan uppträda.
+Detta projekt har skapats för kursen PA1438 på BTH. Syftet är att modellera de väntetider som en användare kan uppleva då många samtidiga användare kan logga in, och var dessa väntetider kan uppträda.
 
 Projektet innehåller filer för att sätta upp en enkel login-applikation, samt för att belasta applikationen med samtidiga användare som loggar in.
 
@@ -16,7 +16,7 @@ Login-applikationen har byggts i Flask, och innehåller router för index, login
 - Login-routen: Tar emot användarens login-uppgifter och verifierar dem. Användarens uppgifter hämtas från databasen, och lösenordet autentiseras med hashing-algoritmen Bcrypt. När uppgifterna har autentiserats, uppdateras databasen med tidstämpel för senaste inloggning. Användarens uppgifter skrivs till session, och användaren dirigeras sedan till home-routen.
 - Home-routen: Renderar användarens inloggade hemsida, hämtar användarens uppgifter från session och visar upp på sidan. 
 
-<img med routs?>
+![sekvensdiagram](sekvensdiagram.png)
 
 ## Locust-skript
 För att belasta login-applikationen med samtidiga användare används Python-biblioteket Locust.
