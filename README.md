@@ -40,7 +40,7 @@ För att köra en testomgång där applikationen belastas med samtidiga använda
 Testkörningen startas genom att i Locust webbgränssnitt ange antalet samtidiga användare, hur många användare som ska läggas till per sekund tills man har uppnått antalet samtidiga användare, samt hur länge körningen ska pågå. För att testa en låg belastning kan exempelvis antalet användare vara 5, där 1 användare läggs till för att komma upp till 5, och att körningen varar i 3 minuter.
 
 ## Locust webbgränssnitt för att ange antal användare och körningstid
-![Locust GUI](sekvensdiagram.png)
+![Locust UI](locust_ui.png)
 
 # Loggning
 I Locust-skriptet loggas data för varje anrop som skickas, och sparas i en .jsonl fil. I Locust genereras ett anrops-id som följer med till loggnignen i Login-applikationen, så att svarstiden i Locust kan jämföras med exekveringstiden för applikationen. 
