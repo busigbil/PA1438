@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Roboto+Serif:ital,opsz,wght@0,8..144,100..900;1,8..144,100..900&display=swap"
+        rel="stylesheet">
+    <title>LoginApp</title>
+</head>
+
+<body>
+
+    <div class="container">
+
+        <h2>Inloggningsformulär</h2>
+
+        <form method="POST" action="/login">
+
+            <label for="username">Användarnamn</label>
+            <input class="textbox" type="text" id="username" name="username" required />
+
+            <label for="password">Lösenord</label>
+            <input class="textbox" type="password" id="password" name="password" required />
+
+            <button class="btn" type="submit">Logga in</button>
+        </form>
+
+    </div>
+
+</body>
+
+</html>
