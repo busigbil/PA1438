@@ -1,0 +1,10 @@
+# docker-compose.yml
+services:
+  app:
+      image: busigbil/app:latest
+      ports:
+        - "5000:5000"
+      volumes:
+        - ./logs:/data
+      environment: 
+        DATABASE_HOST: db

@@ -1,0 +1,27 @@
+# docker-compose.yml
+services:
+  db:
+    image: postgres:14
+    environment:
+      POSTGRES_DB: users_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./../../Database/schema.sql:/docker-entrypoint-initdb.d/schema.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+  
+  seed:
+    image: busigbil/database:latest
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  pgdata:

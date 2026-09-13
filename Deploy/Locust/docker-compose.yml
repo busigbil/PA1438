@@ -1,0 +1,9 @@
+# docker-compose.yml
+services:
+  locust:
+    image: busigbil/locust:latest
+    ports:
+      - "8089:8089"
+    environment:
+      HOST_URL: http://localhost:5000
+      DATABASE_HOST: localhost
