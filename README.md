@@ -60,5 +60,5 @@ För login-applikationen loggas den totala tiden för att exekvera varje route m
 Log-filerna sparas till logs-katalogen på host-enheten och data-katalogen i containern.
 
 # Visualisering av inloggning
-![Login app](login_form.gif)
+![Login app](login_formv2.gif)
 
