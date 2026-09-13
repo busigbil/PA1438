@@ -8,15 +8,13 @@ Projektet är uppdelat i:
 - Locust-skriptet som simulera samtidiga användare som loggar in i applikationen.
 - Databasen med användarens uppgifter, som används både av applikationen och Locust-skriptet.
 
-<img med services?>
+![sekvensdiagram](sekvensdiagram.png)
 
 ## Login-app
 Login-applikationen har byggts i Flask, och innehåller router för index, login och home:
 - Index-routen: Renderar ett HTML-formulär där användaren anger användarnamn och lösenord.
 - Login-routen: Tar emot användarens login-uppgifter och verifierar dem. Användarens uppgifter hämtas från databasen, och lösenordet autentiseras med hashing-algoritmen Bcrypt. När uppgifterna har autentiserats, uppdateras databasen med tidstämpel för senaste inloggning. Användarens uppgifter skrivs till session, och användaren dirigeras sedan till home-routen.
 - Home-routen: Renderar användarens inloggade hemsida, hämtar användarens uppgifter från session och visar upp på sidan. 
-
-![sekvensdiagram](sekvensdiagram.png)
 
 ## Locust-skript
 För att belasta login-applikationen med samtidiga användare används Python-biblioteket Locust.
