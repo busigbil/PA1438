@@ -28,17 +28,11 @@ Databasen används i Locust-scriptet för att hämta användarnamn att logga in 
 
 ## Installation
 Tanken är att tre enheter används för att köra hela projektet; en för applikationen, en för databasen och en för Locust. 
-
 I katalogen för Deploy finns docker-compose-filer för att starta projektet på separata enheter. Då behöver IP-adresser för varje host som används anges som environment-variablar i respektive fil.
-
 För att köra projektet på en och samma enhet, används den första docker-compose-filen som ligger i katalogen. 
-
 Alla docker-compose-filer utgår från befintliga publika Docker-images. Nya Docker-images kan byggas utifrån de Docker-filer som finns i respektive katalog för App, Database, Locust.
-
 Docker-containrarna startas genom att köra docker compose up -d för varje docker-compose-fil på respektive enhet. 
-
 Docker-compose-filen för databasen kommer att skapa en databas-tabell utifrån det schema som finns i filen schema.sql, i katalogen Database. Tabellen kommer fyllas med användar-uppgifter utifrån seed-skriptet som finns i samma katalog. 
-
 Om projektet körs på tre olika enheter behöver databasen startas innan App och Locust, eftersom dessa förutsätter att databas-tabellen finns. 
 
 ## Testkörning
@@ -50,16 +44,17 @@ Testkörningen startas genom att i Locust webbgränssnitt ange antalet samtidiga
 
 # Loggning
 För login-applikationen loggas tiden för att exekvera varje route med Python-biblioteket logger. Loggarna sparas till en jsonl-fil. För login-routen loggas utöver den totala tiden för att exekvera routen även följande data:
-Tid för att göra SELECT-anrop till databasen
-Tid för att verifiera hashat lösenord med Bcrypt
-Tid för att göra UPDATE-anrop till databasen
+- Tid för att göra SELECT-anrop till databasen
+- Tid för att verifiera hashat lösenord med Bcrypt
+- Tid för att göra UPDATE-anrop till databasen
+- Tider för att ansluta till databas-pool för SELECT och UPDATE-anrop
 
 I Locust-skriptet loggas data för varje anrop som skickas, och sparas i en .jsonl fil. Datan som loggas i Locust är:
 Anrops-id
-Starttid för anrop
-Namn på route som anrop skickas till
-Svarstid, alltså tiden från att anropet skickats till att svar kommer tillbaka
-Eventuella exceptions
+- Starttid för anrop
+- Namn på route som anrop skickas till
+- Svarstid, alltså tiden från att anropet skickats till att svar kommer tillbaka
+- Eventuella exceptions
 
 Log-filerna sparas till logs-katalogen på host-enheten och data-katalogen i containern.
 
