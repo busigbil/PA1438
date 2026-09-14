@@ -25,6 +25,9 @@ Locust-skriptet har utformats så att ett visst antal (virtuella) användare ski
 En Postgres-databas skapas i Docker-containern utifrån Postgres officiella Docker-image. Databasen innehåller en tabell med användarens uppgifter, såsom namn, användarnamn, hashat-lösenord, och tidsstämpel för senaste inloggning. Databas-tabellen seedas med användaruppgifter som genereras med Pyhtons Faker-bibliotek, samt hashade-lösenord som genereras med hashing-funktionen Bcrypt. 
 Databasen används i Locust-skriptet för att hämta användarnamn att logga in med. Databasen används också i applikationen för att hämta användarens uppgifter, och för att uppdatera med tidstämpel för senaste inloggning.
 
+## Webbserver
+Projektet använder Gunicorn som webbserver, som tar emot anrop och skickar dem vidare till Flask-appen. I Gunicorn används funktionen gthread, där en masterprocess startar flera arbetsprocesser för att kunna hantera flera anrop samtidigt.
+
 # Installation
 Tanken är att tre enheter används för att köra hela projektet; en för applikationen, en för databasen och en för Locust. 
 I katalogen för Deploy finns docker-compose-filer för att starta projektet på separata enheter. Då behöver IP-adresser för varje host som används anges som environment-variablar i respektive fil.
