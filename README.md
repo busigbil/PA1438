@@ -26,7 +26,7 @@ En Postgres-databas skapas i Docker-containern utifrån Postgres officiella Dock
 Databasen används i Locust-skriptet för att hämta användarnamn att logga in med. Databasen används också i applikationen för att hämta användarens uppgifter, och för att uppdatera med tidstämpel för senaste inloggning.
 
 ## Webbserver
-Projektet använder Gunicorn som webbserver, som tar emot anrop och skickar dem vidare till Flask-appen. I Gunicorn används funktionen gthread, där en masterprocess startar flera arbetsprocesser för att kunna hantera flera anrop samtidigt.
+Projektet använder Gunicorn tillsammans med Nginx som webbserver, för att ta emot och vidarebefordra anrop, samt köra Flask-appen. I Gunicorn används funktionen gthread, där en masterprocess startar flera arbetsprocesser för att kunna hantera flera anrop samtidigt. Nginx används för att göra applikationens server mer applikationslik, och fungerar som en 
 
 # Installation
 Tanken är att tre enheter används för att köra hela projektet; en för applikationen, en för databasen och en för Locust. 
