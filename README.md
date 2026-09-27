@@ -21,6 +21,8 @@ Login-applikationen har byggts i Flask, och innehåller router för index, login
 För att belasta login-applikationen med samtidiga användare används Python-biblioteket Locust.
 Locust-skriptet har utformats så att ett visst antal (virtuella) användare skickar anrop samtidigt till en route. Det innebär att en användare tar ett användarnamn, utför hela login-flödet, och väntar mellan 1 och 5 sekunder innan den tar ett nytt användarnamn och utför login-flödet igen.
 
+Locust-skriptet inleds med att alla användarnamn som finns lagrade i database hämtas och skrivs till en lista. För varje anrop som skickas, tas en 
+
 ## Databas
 En Postgres-databas skapas i Docker-containern utifrån Postgres officiella Docker-image. Databasen innehåller en tabell med användarens uppgifter, såsom namn, användarnamn, hashat-lösenord, och tidsstämpel för senaste inloggning. Databas-tabellen seedas med användaruppgifter som genereras med Pyhtons Faker-bibliotek, samt hashade-lösenord som genereras med hashing-funktionen Bcrypt. 
 Databasen används i Locust-skriptet för att hämta användarnamn att logga in med. Databasen används också i applikationen för att hämta användarens uppgifter, och för att uppdatera med tidstämpel för senaste inloggning.
