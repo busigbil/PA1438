@@ -15,7 +15,12 @@ Projektet är uppdelat i:
 Login-applikationen har byggts i Flask, och innehåller router för index, login och home:
 - Index-routen: Renderar ett HTML-formulär där användaren anger användarnamn och lösenord.
 - Login-routen: Tar emot användarens login-uppgifter och verifierar dem. Användarens uppgifter hämtas från databasen, och lösenordet autentiseras med hashing-algoritmen Bcrypt. När uppgifterna har autentiserats, uppdateras databasen med tidstämpel för senaste inloggning. Användarens uppgifter skrivs till session, och användaren dirigeras sedan till home-routen.
-- Home-routen: Renderar användarens inloggade hemsida, hämtar användarens uppgifter från session och visar upp på sidan. 
+- Home-routen: Renderar användarens inloggade hemsida, hämtar användarens uppgifter från session och visar upp på sidan.
+
+### Bcrypt och kostnadsfaktor
+Alla användares lösenord har lagrats i databasen som bcrypt-hashar med kostnadsfaktor 10. Hashen innehåller både salt och kostnadsfaktor. När lösenordet verifieras används samma salt och kostnadsfaktor för att hasha lösenordet som användaren använt vid inloggning, och jämför detta med den lagrade lösenords-hashen från databasen.
+
+Bcrypt är avsiktligt beräkningstungt för att försvåra lösenords-attacker. Kostnadsfaktorn är en exponent som styr hur tung beräkningen är. Faktor 10 innebär att 2^10 (1024) rundor i bcrypts nyckelschema utförs. Det påverkar både exekveringstiden och CPU-belastningen. Varje hashning är CPU-bunden och enkeltrådad, och upptar en CPU-kärna medan den pågår. Tiden för att hasha lösenordet med kostnadsfaktor 10 uppskattas till 50 - 100 millisekunder. 
 
 ## Locust-skript
 För att belasta login-applikationen med samtidiga användare används Python-biblioteket Locust.
