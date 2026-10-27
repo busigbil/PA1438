@@ -23,10 +23,10 @@ Alla användares lösenord har lagrats i databasen som bcrypt-hashar med kostnad
 Bcrypt är avsiktligt beräkningstungt för att försvåra lösenords-attacker. Kostnadsfaktorn är en exponent som styr hur tung beräkningen är. Faktor 10 innebär att 2^10 (1024) rundor i bcrypts nyckelschema utförs. Det påverkar både exekveringstiden och CPU-belastningen. Varje hashning är CPU-bunden och enkeltrådad, och upptar en CPU-kärna medan den pågår. Tiden för att hasha lösenordet med kostnadsfaktor 10 uppskattas till 50 - 100 millisekunder. 
 
 ## Locust-skript
-För att belasta login-applikationen med samtidiga användare används Python-biblioteket Locust.
-Locust-skriptet har utformats så att ett visst antal (virtuella) användare skickar anrop samtidigt till en route. Det innebär att en användare tar ett användarnamn, utför hela login-flödet, och väntar mellan 1 och 5 sekunder innan den tar ett nytt användarnamn och utför login-flödet igen.
+För att belasta inloggningsapplikationen med samtidiga användare används Python-biblioteket Locust. Testskriptet är utformat för att simulera ett specificerat antal virtuella användare som skickar anrop till en given route. Inledningsvis hämtas samtliga användarnamn från databasen och lagras i en lista. Vid varje nytt inloggningsförsök väljs ett slumpmässigt användarnamn från listan. För enkelhets skull har alla användare samma lösenord.
 
-Locust-skriptet inleds med att alla användarnamn som finns lagrade i database hämtas och skrivs till en lista. För varje anrop som skickas, tas en 
+Varje användare som skapas i Locust fungerar som en egen isolerad webbläsare. De cookies som skapas under sessionen sparas till den specifika användaren. I slutet av varje inloggningflöde rensar skriptet cookies, så att dessa inte skickas automatiskt i nästkommande flöden. 
+
 
 ## Databas
 En Postgres-databas skapas i Docker-containern utifrån Postgres officiella Docker-image. Databasen innehåller en tabell med användarens uppgifter, såsom namn, användarnamn, hashat-lösenord, och tidsstämpel för senaste inloggning. Databas-tabellen seedas med användaruppgifter som genereras med Pyhtons Faker-bibliotek, samt hashade-lösenord som genereras med hashing-funktionen Bcrypt. 
