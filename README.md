@@ -9,7 +9,7 @@ Projektet är uppdelat i:
 - Databasen med användarens uppgifter, som används både av applikationen och Locust-skriptet.
 
 ## Sekvensdiagram för projektet
-![sekvensdiagram](sekvensdiagram.png)
+![sekvensdiagram](sekvensdiagramV2.png)
 
 ## Login-app
 Login-applikationen har byggts i Flask, och innehåller router för index, login och home:
