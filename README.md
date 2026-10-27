@@ -57,7 +57,7 @@ Docker Engine är en kontainer-teknologi som möjliggör för att köra en appli
 En utförlig beskrivning om hur Docker installeras på Ubuntu finns på: [Docker docs](https://docs.docker.com/engine/install/ubuntu/#install-using-the-repository )
 
 Nedan följer en beskrivning om hur Docker Engine installeras i Ubuntu med hjälp av Dockers apt-repository:
-```bash
+```console
 # Add Docker's official GPG key:
 sudo apt update
 sudo apt install ca-certificates curl
@@ -78,14 +78,17 @@ EOF
 sudo apt update
 ```
 För att installera senaste versionen av Docker-paketen körs:
-```bash
+```console
 sudo apt install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 ```
 För att verifiera att Docker körs:
-```bash
+```console
 sudo systemctl status docker
 ```
 
+I katalogen för Deploy finns docker-compose-filer för att starta projektet på tre separata maskiner. För att kunna köra projektet behöver korrekta IP-adresser för varje host anges som environment-variablar i respektive fil. Alla docker-compose-filer utgår från existerande publika Docker-images. Nya Docker-images kan byggas utifrån de Docker-filer som finns i respektive katalog för App, Database, Locust. I maskinen som kör applikationen ska separata Docker-containrar köras för Nginx och en för Gunicorn + Flask.
+
+Docker-compose-filen för databasen kommer att skapa en databas-tabell utifrån det schema som finns i filen schema.sql, i katalogen Database. Tabellen kommer fyllas med användar-uppgifter utifrån seed-skriptet som finns i samma katalog. 
 
 
 # Testkörning
