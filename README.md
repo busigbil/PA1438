@@ -112,7 +112,10 @@ Testkörningen startas genom att i Locust webbgränssnitt ange antalet samtidiga
 ## Locust webbgränssnitt för att ange antal användare och körningstid
 ![Locust UI](locust_ui.png)
 
-# Loggning
+# Datainsamling
+Vid varje testkörning per belastningsnivå samlas data med loggade svarstider och resursanvändning in. Datan som samlas in beskrivs nedan.
+
+## Loggning
 I Locust-skriptet loggas data för varje anrop som skickas, och sparas i en .jsonl fil. I Locust genereras ett anrops-id som följer med till loggnignen i Login-applikationen, så att svarstiden i Locust kan jämföras med exekveringstiden för applikationen. 
 Datan som loggas i Locust är:
 - Anrops-id
@@ -128,6 +131,9 @@ För login-applikationen loggas den totala tiden för att exekvera varje route m
 - Tid för att verifiera hashat lösenord med Bcrypt
 
 Log-filerna sparas till logs-katalogen på host-enheten och data-katalogen i containern.
+
+## Resursmätning
+
 
 # Visualisering av inloggning
 ![Login app](login_formv2.gif)
