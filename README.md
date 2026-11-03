@@ -67,7 +67,7 @@ För att kontrollera att Ansible har installerats korrekt kan följande kommando
 ```console
 ansible --version
 ```
-Installera Ansible collection, för att kunna köra ANsible-playbooks som finns i katalogen:
+Installera Ansible collection, för att kunna köra Ansible-playbooks som finns i katalogen:
 ```console
 ansible-galaxy collection install community.general
 ```
@@ -75,49 +75,40 @@ Verifiera att Ansible collection har installerats:
 ```console
 ansible-galaxy collection list
 ```
-
+För att kunna köra Ansible-playbooks ska korrekta IP-adresser till maskinerna anges i inventory.yml
 
 ## Docker 
-Docker Engine är en kontainer-teknologi som möjliggör för att köra en applikation och alla dess beroenden inom en isolerad miljö (container). Projektet förutsätter att Docker Engine finns installerat på alla maskiner, eftersom alla delar körs i Docker-containrar. 
+Docker Engine är en container-teknologi som möjliggör för att köra en applikation och alla dess beroenden inom en isolerad miljö (container). Projektet förutsätter att Docker Engine finns installerat på alla maskiner, eftersom alla delar körs i Docker-containrar. 
 
 En utförlig beskrivning om hur Docker installeras på Ubuntu finns på: [Docker docs](https://docs.docker.com/engine/install/ubuntu/#install-using-the-repository )
 
-Nedan följer en beskrivning om hur Docker Engine installeras i Ubuntu med hjälp av Dockers apt-repository:
+Installera Docker genom att köra Ansible-playbook, som installerar Docker och Docker compose på alla hostar:
 ```console
-# Add Docker's official GPG key:
-sudo apt update
-sudo apt install ca-certificates curl
-sudo install -m 0755 -d /etc/apt/keyrings
-sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
-sudo chmod a+r /etc/apt/keyrings/docker.asc
-
-# Add the repository to Apt sources:
-sudo tee /etc/apt/sources.list.d/docker.sources <<EOF
-Types: deb
-URIs: https://download.docker.com/linux/ubuntu
-Suites: (./etc/os-release&&echo"{UBUNTU_CODENAME:-$VERSION_CODENAME}")
-Components: stable
-Architectures: $(dpkg --print-architecture)
-Signed-By: /etc/apt/keyrings/docker.asc
-EOF
-
-sudo apt update
+ansible-playbook -i inventory install-docker.yml
 ```
-För att installera senaste versionen av Docker-paketen körs:
+Verifiera att Docker har installerats korrekt:
 ```console
-sudo apt install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
-```
-För att verifiera att Docker körs:
-```console
-sudo systemctl status docker
+docker --version
+docker compose version
 ```
 
 I katalogen för Deploy finns docker-compose-filer för att starta projektet på tre separata maskiner. För att kunna köra projektet behöver korrekta IP-adresser för varje host anges som environment-variablar i respektive fil. Alla docker-compose-filer utgår från existerande publika Docker-images. Nya Docker-images kan byggas utifrån de Docker-filer som finns i respektive katalog för App, Database, Locust. I maskinen som kör applikationen ska separata Docker-containrar köras för Nginx och en för Gunicorn + Flask.
 
 Docker-compose-filen för databasen kommer att skapa en databas-tabell utifrån det schema som finns i filen schema.sql, i katalogen Database. Tabellen kommer fyllas med användar-uppgifter utifrån seed-skriptet som finns i samma katalog. 
 
+## Chrony
+Chrony är ett protokoll som bygger på Network Time Protocol (NTP), och används för att synkronisera klockor över ett nätverk. Det är viktigt att klockorna på de olika maskinerna är synkroniserade, för att loggade resurs-mätningar som görs på maskinerna ska kunna jämföras. Chrony installeras på alla maskiner. För att synkronisera klockorna mellan maskinerna, ska en maskin sättas upp som en NTP-server, medan de andra är NTP-klienter. 
 
+För projektet används maskinen som kör Locust som NTP-server, medans maskinerna som kör appliaktionen och databasen är klienter.
 
+Installera Chrony genom att köra Ansible-playbook:
+```console
+ansible-playbook -i inventory install-chrony.yml
+```
+Kontrollera att tjänsten chronyd är aktiv:
+```console
+systemctl status chronyd
+```
 
 # Testkörning
 För att köra en testomgång där applikationen belastas med samtidiga användare som försöker logga in, börjar man med att starta alla containrar med kommandot docker compose up -d. Genom att köra kommandot docker compose logs på enheten som har containern för Locust-skriptet, kan man se adressen för Locust webbgränssnitt, exempelvis http://0.0.0.0:8089.
