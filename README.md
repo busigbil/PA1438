@@ -52,7 +52,9 @@ Varje Gunicorn worker motsvarar en egen process, med en egen databaspool. Därf�
 För att köra projektet behöver Ansible, Docker, Chrony och DPMI vara installerat. I Ansible-katalogen finns filer, så kallade Ansible-playbooks, för att installera Docker och Chrony på alla maskiner. 
 
 ## Ansible
-Ansible är en automations-plattform som används för konfigurationshantering, applikationsdistribution och orkestrering av IT-miljöer. Med hjälp av Ansible kan projektet styras från en separat dator, eftersom Ansible kommunicerar direkt med maskinerna genom SSH-protokoll. Ansible behöver inte installeras på maskinerna som kör projektet, däremot behöver det vara installerat på maskinen som ska köra Ansible. 
+Ansible är en automations-plattform som används för konfigurationshantering, applikationsdistribution och orkestrering av IT-miljöer. Med hjälp av Ansible kan projektet styras från en separat dator, eftersom Ansible kommunicerar direkt med maskinerna genom SSH-protokoll. 
+
+Ansible behöver inte installeras på maskinerna som kör projektet, däremot behöver det vara installerat på maskinen som ska köra Ansible. 
 
 En utförlig beskrivning för att installera Ansible finns på: [Ansible docs](https://docs.ansible.com/projects/ansible/latest/installation_guide/intro_installation.html)
 
@@ -75,14 +77,14 @@ Verifiera att Ansible collection har installerats:
 ```console
 ansible-galaxy collection list
 ```
-För att kunna köra Ansible-playbooks ska korrekta IP-adresser till maskinerna anges i inventory.yml
+För att kunna köra Ansible-playbooks ska korrekta IP-adresser till maskinerna anges i filen inventory.yml
 
 ## Docker 
 Docker Engine är en container-teknologi som möjliggör för att köra en applikation och alla dess beroenden inom en isolerad miljö (container). Projektet förutsätter att Docker Engine finns installerat på alla maskiner, eftersom alla delar körs i Docker-containrar. 
 
 En utförlig beskrivning om hur Docker installeras på Ubuntu finns på: [Docker docs](https://docs.docker.com/engine/install/ubuntu/#install-using-the-repository )
 
-Installera Docker genom att köra Ansible-playbook, som installerar Docker och Docker compose på alla hostar:
+Installera Docker genom att köra den Ansible-playbook som installerar Docker och Docker compose på alla hostar:
 ```console
 ansible-playbook -i inventory install-docker.yml
 ```
@@ -99,7 +101,7 @@ Docker-compose-filen för databasen kommer att skapa en databas-tabell utifrån 
 ## Chrony
 Chrony är ett protokoll som bygger på Network Time Protocol (NTP), och används för att synkronisera klockor över ett nätverk. Det är viktigt att klockorna på de olika maskinerna är synkroniserade, för att loggade resurs-mätningar som görs på maskinerna ska kunna jämföras. Chrony installeras på alla maskiner. För att synkronisera klockorna mellan maskinerna, ska en maskin sättas upp som en NTP-server, medan de andra är NTP-klienter. 
 
-För projektet används maskinen som kör Locust som NTP-server, medans maskinerna som kör appliaktionen och databasen är klienter.
+För projektet används maskinen som kör Locust som NTP-server, medans maskinerna som kör applikationen och databasen är klienter.
 
 Installera Chrony genom att köra Ansible-playbook:
 ```console
@@ -109,6 +111,11 @@ Kontrollera att tjänsten chronyd är aktiv:
 ```console
 systemctl status chronyd
 ```
+
+## Distributed Passive Measurement Infrastructure
+Distributed Passive Measurement Infrastructure (DPMI) är ett ramverk för nätverksövervakning som använder sensorer utplacerade över flera nätverksdomäner för att samla in, bearbeta och analysera pakettrafik. 
+
+I labbmiljön placeras en DPMI-mätpunkt mellan Locust och applikationsvärden för att kunna samla in data över trafiken.
 
 # Testkörning
 För att köra en testomgång där applikationen belastas med samtidiga användare som försöker logga in, börjar man med att starta alla containrar med kommandot docker compose up -d. Genom att köra kommandot docker compose logs på enheten som har containern för Locust-skriptet, kan man se adressen för Locust webbgränssnitt, exempelvis http://0.0.0.0:8089.
