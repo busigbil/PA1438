@@ -118,6 +118,15 @@ Distributed Passive Measurement Infrastructure (DPMI) är ett ramverk för nätv
 I labbmiljön placeras en DPMI-mätpunkt mellan Locust och applikationsservern för att mäta nätverkstrafiken. Eftersom den mäter både anrop och svar med samma klocka kan serverns totala svarstid mätas utan klocksynkronisering. Resultatet kan jämföras med Locusts svarstid och Flasks route-tid. Mätpunkten kan även upptäcka TCP-problem, exempelvis SYN-retransmissioner vid full backlog. 
 
 # Testkörning
+För att kunna genomföra test-körningarna behöver alla Docker-compose filer startas på respektive maskin. I Ansible katalogen finns en playbook för att kopiera Docker-compose-filerna, och starta upp Docker containrarna. 
+
+Kör den Ansible-playbook som kopierar Docker-compose-filerna och startar containrarna: 
+```console
+ansible-playbook -i inventory deploy.yml
+```
+
+
+
 För att köra en testomgång där applikationen belastas med samtidiga användare som försöker logga in, börjar man med att starta alla containrar med kommandot docker compose up -d. Genom att köra kommandot docker compose logs på enheten som har containern för Locust-skriptet, kan man se adressen för Locust webbgränssnitt, exempelvis http://0.0.0.0:8089.
 
 Testkörningen startas genom att i Locust webbgränssnitt ange antalet samtidiga användare, hur många användare som ska läggas till per sekund tills man har uppnått antalet samtidiga användare, samt hur länge körningen ska pågå. På så sätt kan applikationen testas under olika nivåer av belastning. För att testa en låg belastning kan exempelvis antalet användare vara 5, där 1 användare läggs till för att komma upp till 5, och att körningen varar i 3 minuter.
