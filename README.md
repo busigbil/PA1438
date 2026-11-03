@@ -115,7 +115,7 @@ systemctl status chronyd
 ## Distributed Passive Measurement Infrastructure
 Distributed Passive Measurement Infrastructure (DPMI) är ett ramverk för nätverksövervakning som använder sensorer utplacerade över flera nätverksdomäner för att samla in, bearbeta och analysera pakettrafik. 
 
-I labbmiljön placeras en DPMI-mätpunkt mellan Locust och applikationsvärden för att kunna samla in data över trafiken.
+I labbmiljön placeras en DPMI-mätpunkt mellan Locust och applikationsservern för att mäta nätverkstrafiken. Eftersom den mäter både anrop och svar med samma klocka kan serverns totala svarstid mätas utan klocksynkronisering. Resultatet kan jämföras med Locusts svarstid och Flasks route-tid. Mätpunkten kan även upptäcka TCP-problem, exempelvis SYN-retransmissioner vid full backlog. 
 
 # Testkörning
 För att köra en testomgång där applikationen belastas med samtidiga användare som försöker logga in, börjar man med att starta alla containrar med kommandot docker compose up -d. Genom att köra kommandot docker compose logs på enheten som har containern för Locust-skriptet, kan man se adressen för Locust webbgränssnitt, exempelvis http://0.0.0.0:8089.
