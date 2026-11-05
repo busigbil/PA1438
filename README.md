@@ -148,8 +148,8 @@ Före mätningarna görs en överslagsberäkning av dessa nivåer, för att kunn
 
 För att estimera svarstiden $W$ behöver både tiden som processorn utför en uppgift, och tiden för att vänta på I/O, tas med i beräkningen. För projektet kommer hashningen med bcrypt utgöra den största CPU-bundna tiden. Med kostnadsfaktor 10 uppskattas denna tid till 0,1s. Projektet har flera uppgifter som innebär I/O-väntan, som nätverkstransport, databasanrop och nedladdning av HTML-sidor. Denna tid uppskattas till 0,05s. Den totala svarstiden för ett enskilt anrop beräknas därmed till: $W=0,1 + 0,05 = 0,15s$
 
-Eftersom hashningen med bcrypt är CPU-bunden, kommer detta att bestämma de fysiska begränsningar som systemet har. En CPU-kärna kan bara hantera en bcrypt-hashning vid ett givet tillfälle, vilket innebär maximalt 1 CPU-kärna / 0,1s = 10 anrop per sekund. Med fyra CPU-kärnor innebär det att den maximala genomströmningen som systemet kan hantera är:
-$\lambda_{text{max}} = \frac{4}{0,1} = 40\ \text{anrop/s}$
+Eftersom bcrypt-hashningen är CPU-bunden förväntas den begränsa systemets maximala genomströmning. Med en beräknad CPU-tid på 0,1 sekunder per hashning kan en CPU-kärna hantera maximalt 10 hashningar per sekund. Med fyra CPU-kärnor blir den teoretiska maximala genomströmningen därmed 40 anrop per sekund:
+$\lambda_{max} = \frac{4}{0,1} = 40\ \text{anrop/s}$
 
 # Datainsamling
 Vid varje testkörning per belastningsnivå samlas data med loggade svarstider och resursanvändning in. Datan som samlas in beskrivs nedan.
