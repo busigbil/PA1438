@@ -25,13 +25,6 @@ Alla användares lösenord har lagrats i databasen som bcrypt-hashar med kostnad
 
 Bcrypt är avsiktligt beräkningstungt för att försvåra lösenords-attacker. Kostnadsfaktorn är en exponent som styr hur tung beräkningen är. Faktor 10 innebär att bcrypt kör krypteringsprocessen 2^10 (1024) varv efter varandra. Det påverkar både exekveringstiden och CPU-belastningen. Varje hashning är CPU-bunden och enkeltrådad, och upptar en CPU-kärna medan den pågår.
 
-## Locust-skript
-För att belasta inloggningsapplikationen med samtidiga användare används Python-biblioteket Locust. Testskriptet är utformat för att simulera ett specificerat antal virtuella användare som skickar anrop till en given route. Inledningsvis hämtas samtliga användarnamn från databasen och lagras i en lista. Vid varje nytt inloggningsförsök väljs ett slumpmässigt användarnamn från listan. För enkelhets skull har alla användare samma lösenord.
-
-Varje användare som skapas i Locust fungerar som en egen isolerad webbläsare. De cookies som skapas under sessionen sparas till den specifika användaren. I slutet av varje inloggningflöde rensar skriptet cookies, så att dessa inte skickas automatiskt i nästkommande flöden. 
-
-För att minska risken för att Locust utgör en flaskhals körs belastningstesterna i distribuerat läge med en master-process och flera worker-processer. Applikationen förväntas bli mättat vid en relativt låg nivå av samtidiga användare, därför bedöms den valda konfigurationen vara tillräcklig för testernas syfte. 
-
 ## Webbserver
 Projektet använder Gunicorn tillsammans med Nginx för att serva Flask-applikationen. Nginx är en webbserver som ligger framför Gunicorn och tar emot och vidarebefordrar alla HTTP-anrop som anländer från Locust. Gunicorn är en Python Web Server Gateway Interface (WSGI) server, vilket innebär att den tar emot HTTP-anrop från Nginx, och översätter dem till WSGI-formatet som Flask-applikationen kan hantera, så att applikationen kan köras och returnera ett svar. 
 
@@ -40,6 +33,13 @@ Tanken med projektet är att vara produktionslikt, utan medvetet inbyggda felkä
 Eftersom verifieringen med bcrypt upptar CPU-kärnor vid hashning, anpassas antalet workers utifrån tillgängliga CPU-kärnor. Med den tillgängliga hårdvaran motsvarar detta fyra workers. Eftersom applikationen även utför flera I/O-operationer, som databasanrop, använder projektet Gunicorns worker-typ gthreads. Gthreads möjliggör för flera trådar per worker, där varje tråd kan hantera ett anrop. För att förhindra att inkommande anrop fastnar i Gunicorns backlog i ett tidigt skede, har antalet trådar per worker satts till sex stycken. 
 
 Projektets kombination av workers och trådar innebär att maximalt 4 workers * 6 trådar = 24 anrop kan hanteras samtidigt inuti applikationen. Om en ny anslutning görs när alla workers är upptagna, kommer den att hamna i Gunicorns backlog. Som storlek på Gunicorns backlog används standardvärdet på 2048. Om antalet anslutningar i backlog överstiger 2048, kommer nya klienter som försöker ansluta få ett felmeddelande. För att säkerställa att workers inte fastnar, använder Gunicorn timeout. I projektet används Gunicorns standard timeout om 30 sekunder. Det innebär att en worker som har varit stilla i 30 sekunder kommer att avbrytas och starta om. 
+
+## Locust-skript
+För att belasta inloggningsapplikationen med samtidiga användare används Python-biblioteket Locust. Testskriptet är utformat för att simulera ett specificerat antal virtuella användare som skickar anrop till en given route. Inledningsvis hämtas samtliga användarnamn från databasen och lagras i en lista. Vid varje nytt inloggningsförsök väljs ett slumpmässigt användarnamn från listan. För enkelhets skull har alla användare samma lösenord.
+
+Varje användare som skapas i Locust fungerar som en egen isolerad webbläsare. De cookies som skapas under sessionen sparas till den specifika användaren. I slutet av varje inloggningflöde rensar skriptet cookies, så att dessa inte skickas automatiskt i nästkommande flöden. 
+
+För att minska risken för att Locust utgör en flaskhals körs belastningstesterna i distribuerat läge med en master-process och flera worker-processer. Applikationen förväntas bli mättat vid en relativt låg nivå av samtidiga användare, därför bedöms den valda konfigurationen vara tillräcklig för testernas syfte. 
 
 ## Databas
 Som databashanterare används PostgreSQL, och databasen skapas i Docker-containern utifrån Postgres officiella Docker-image. Den innehåller en tabell med användarens uppgifter, såsom namn, användarnamn, hashat-lösenord, och tidsstämpel för senaste inloggning. Databas-tabellen seedas med användaruppgifter som genereras med Pythons Faker-bibliotek, samt hashade-lösenord. 
