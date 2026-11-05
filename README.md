@@ -213,7 +213,7 @@ Mätdata samlas in vid två tidpunkter, för att isolera testets stabila fas. De
 
 Genom att beräkna skillnaden mellan det slutliga och det inledande stickprovet fås ett mått på resursförbrukningen under den stabila mätperioden. Utifrån detta mått beräknas systemets nyttjandegrad ($\rho$) enligt följande formel:
 
-$$\rho = \frac{\text{Uppmätt CPU-tid}}{\text{Mätperiodens längd \times Antal CPU-kärnor}}$$
+$$\rho = \frac{\text{Uppmätt CPU-tid}}{\text{Mätperiodens längd x Antal CPU-kärnor}}$$
 
 Datainsamlingen för resursutnyttjande är automatiserad via den Ansible-playbook kör testerna, och triggar Bash-skripten vid uppvärmningens slut samt vid testets slut. Skripten skriver sedan resursdata direkt till json-filer med tillhörande tidsstämplar. 
 
