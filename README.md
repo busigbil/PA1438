@@ -221,7 +221,7 @@ $$\rho = \frac{\text{Uppmätt CPU-tid}}{\text{Mätperiodens längd x Antal CPU-k
 Datainsamlingen för resursutnyttjande är automatiserad via den Ansible-playbook kör testerna, och triggar Bash-skripten vid uppvärmningens slut samt vid testets slut. Skripten skriver sedan resursdata direkt till json-filer med tillhörande tidsstämplar. 
 
 ## Sekvensdiagram med mätpunkter
-<BILD MED DATAPUNKTER>	
+![Sequence diagram with measurement points](measure_diagram.png)
 
 
 
