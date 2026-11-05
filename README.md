@@ -160,11 +160,11 @@ Eftersom bcrypt-hashningen är CPU-bunden förväntas den begränsa systemets ma
 
 $$\lambda_{max} = \frac{4}{0,1} = 40\ \text{anrop/s}$$
 
-Utifrån en genomsnittlig total svarstid på 0,15 sekunder kan den uppskattade belastningen vid denna genomströmning beräknas med Littles sats:
+Utifrån en genomsnittlig total svarstid på 0,15 sekunder och genomströmningen om 40 anrop per sekund, kan den uppskattade belastningen beräknas med Littles sats:
 
 $$N = 40 \times 0,15 = 6\ \text{anrop i systemet}$$
 
-Detta innebär att i genomsnitt sex anrop befinner sig i systemet vid en genomströmning på 40 anrop per sekund och en genomsnittlig svarstid på 0,15 sekunder. Beräkningen beskriver det förväntade antalet samtidiga anrop som systemet uppskattas kunna hantera.
+Beräkningen beskriver det förväntade antalet samtidiga anrop som systemet uppskattas kunna hantera.
 
 ### Uppskattning av antal användare
 För att uppskatta hur många virtuella Locust-användare som krävs för att generera omkring 40 anrop per sekund beräknas den genomsnittliga tiden för hela anropscykeln. Varje användare antas skicka ett anrop, invänta svaret och därefter vänta mellan 1 och 3 sekunder innan nästa anrop skickas.
