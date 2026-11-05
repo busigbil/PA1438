@@ -148,6 +148,7 @@ Inför mätningarna görs en teoretisk överslagsberäkning för att uppskatta v
 
 ### Littles sats
 För att uppskatta antalet samtidiga anrop används Littles sats, som beskriver sambandet mellan genomströmning, svarstid och det genomsnittliga antalet anrop i systemet:
+
 $$N= \lambda \times W $$
 
 Där ($N$) är det genomsnittliga antalet anrop i systemet, ($\lambda$) är genomströmningen i anrop per sekund och ($W$) är den genomsnittliga tiden ett anrop tillbringar i systemet. Resultatet beskriver alltså det genomsnittliga antalet samtidiga anrop, inte antalet virtuella användare eller systemets maximala kapacitet.
@@ -156,10 +157,12 @@ Där ($N$) är det genomsnittliga antalet anrop i systemet, ($\lambda$) är geno
 För att uppskatta svarstiden används antaganden om både CPU-bunden bearbetning och I/O-väntan. I projektet förväntas bcrypt-hashning utgöra en betydande del av den CPU-bundna bearbetningen. Med den valda kostnadsfaktorn uppskattas hashningstiden till cirka 0,1 s per anrop. Därutöver uppskattas den sammanlagda I/O-väntan, exempelvis för nätverkskommunikation och databasanrop, till cirka 0,05 s. Den uppskattade totala svarstiden blir därmed 0,15 s per anrop.
 
 Eftersom bcrypt-hashningen är CPU-bunden förväntas den begränsa systemets maximala genomströmning. Med en uppskattad CPU-tid på 0,1 s per hashning kan en CPU-kärna hantera maximalt 10 hashningar per sekund. Med fyra CPU-kärnor blir den teoretiska maximala genomströmningen därmed 40 anrop per sekund:
+
 $\lambda_{max} = \frac{4}{0,1} = 40\ \text{anrop/s}$
 
 Utifrån en genomsnittlig total svarstid på 0,15 s kan den uppskattade belastningen vid denna genomströmning beräknas med Littles sats:
-$$N = 40 \times 0,15 = 6 \text{anrop i systemet}$$
+
+$$N = 40 \times 0,15 = 6\ \text{anrop i systemet}$$
 
 Detta innebär att i genomsnitt sex anrop befinner sig i systemet vid en genomströmning på 40 anrop per sekund och en genomsnittlig svarstid på 0,15 s. Beräkningen beskriver det förväntade antalet samtidiga anrop som systemet uppskattas kunna hantera.
 
@@ -167,12 +170,15 @@ Detta innebär att i genomsnitt sex anrop befinner sig i systemet vid en genomst
 För att uppskatta hur många virtuella Locust-användare som krävs för att generera omkring 40 anrop per sekund beräknas den genomsnittliga tiden för hela anropscykeln. Varje användare antas skicka ett anrop, invänta svaret och därefter vänta mellan 1 och 3 sekunder innan nästa anrop skickas.
 
 Med en uppskattad svarstid på 0,15 sekunder och en genomsnittlig väntetid på 2 sekunder blir totaltiden för anropscykeln:
+
 $$ T = 0,15 + frac{1 + 3}{2} = 2,15s $$
 
 Det genomsnittliga antalet anrop per sekund och användare uppskattas därmed till:
+
 $$X_användare = \frac{1}{2,15} \approx 0,465\ anrop/s$$
 
 Antalet virtuella användare som teoretiskt krävs för att generera 40 anrop per sekund blir:
+
 $$N = \frac{40}{0,465} \approx 86\ \text{användare}$$
 
 Detta ger en teoretisk uppskattning på cirka 86 virtuella användare för att nå den beräknade genomströmningen om 40 anrop/s. Uppskattningen förutsätter att svarstiden förblir 150 ms även vid denna belastning och att varje användare skickar ett anrop per cykel.
