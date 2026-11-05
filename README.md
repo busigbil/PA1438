@@ -173,7 +173,7 @@ Med en uppskattad svarstid på 0,15 sekunder och en genomsnittlig väntetid på 
 
 Det genomsnittliga antalet anrop per sekund och användare uppskattas därmed till:
 
-$$X_användare = \frac{1}{2,15} \approx 0,465\ anrop/s$$
+$$X_\text{användare} = \frac{1}{2,15} \approx 0,465\ \text{anrop/s}$$
 
 Antalet virtuella användare som teoretiskt krävs för att generera 40 anrop per sekund blir därmed:
 
