@@ -159,7 +159,7 @@ Eftersom bcrypt-hashningen är CPU-bunden förväntas den begränsa systemets ma
 $\lambda_{max} = \frac{4}{0,1} = 40\ \text{anrop/s}$
 
 Utifrån en genomsnittlig total svarstid på 0,15 s kan den uppskattade belastningen vid denna genomströmning beräknas med Littles sats:
-$$N = 40 \times 0,15 = 6 \text{anrop i systemet]$$
+$$N = 40 \times 0,15 = 6 \text{anrop i systemet}$$
 
 Detta innebär att i genomsnitt sex anrop befinner sig i systemet vid en genomströmning på 40 anrop per sekund och en genomsnittlig svarstid på 0,15 s. Beräkningen beskriver det förväntade antalet samtidiga anrop som systemet uppskattas kunna hantera.
 
@@ -173,7 +173,7 @@ Det genomsnittliga antalet anrop per sekund och användare uppskattas därmed ti
 $$X_användare = \frac{1}{2,15} \approx 0,465\ anrop/s$$
 
 Antalet virtuella användare som teoretiskt krävs för att generera 40 anrop per sekund blir:
-$$N = \frac{40}{0,465} \approx 86 \text{användare}$$
+$$N = \frac{40}{0,465} \approx 86\ \text{användare}$$
 
 Detta ger en teoretisk uppskattning på cirka 86 virtuella användare för att nå den beräknade genomströmningen om 40 anrop/s. Uppskattningen förutsätter att svarstiden förblir 150 ms även vid denna belastning och att varje användare skickar ett anrop per cykel.
 
