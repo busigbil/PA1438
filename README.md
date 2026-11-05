@@ -144,7 +144,7 @@ För att se hur systemet påverkas av belastning, utförs testerna under fyra be
 - Hög belastning: En nivå där systemet närmar sig sin kapacitetsgräns, vilket kan medföra ökande svarstider trots att genomströmningen fortfarande ökar eller ligger kvar nära sin maximala nivå.
 - Överbelastning: En nivå där systemet inte längre kan hantera den inkommande belastningen med acceptabel prestanda. Detta kan medföra kraftigt ökade svarstider, fler felaktiga anrop eller minskad genomströmning.
 
-Inför mätningarna görs en teoretisk överslagsberäkning för att uppskatta vid vilken belastning systemet kan förväntas nå sin kapacitetsgräns. Beräkningen baseras på den uppskattade CPU-tiden för bcrypt-hashning, antalet tillgängliga CPU-kärnor och Littles sats. Syftet är att få en teoretisk referenspunkt för val av belastningsnivåer och förväntad systemkapacitet. Efter mätningarna jämförs uppskattningen med de uppmätta svarstiderna och genomströmningen, för att undersöka hur väl beräkningen överensstämmer med systemets faktiska beteende.
+Inför mätningarna görs en teoretisk överssberäkning för att uppskatta vid vilken belastning systemet kan förväntas nå sin kapacitetsgräns. Beräkningen baseras på den uppskattade CPU-tiden för bcrypt-hashning, antalet tillgängliga CPU-kärnor och Littles sats. Syftet är att få en teoretisk referenspunkt för val av belastningsnivåer och förväntad systemkapacitet. Efter mätningarna jämförs uppskattningen med de uppmätta svarstiderna och genomströmningen, för att undersöka hur väl beräkningen överensstämmer med systemets faktiska beteende.
 
 ### Littles sats
 För att uppskatta antalet samtidiga anrop används Littles sats, som beskriver sambandet mellan genomströmning, svarstid och det genomsnittliga antalet anrop i systemet:
@@ -154,38 +154,36 @@ $$N= \lambda \times W $$
 Där ($N$) är det genomsnittliga antalet anrop i systemet, ($\lambda$) är genomströmningen i anrop per sekund och ($W$) är den genomsnittliga tiden ett anrop tillbringar i systemet. Resultatet beskriver alltså det genomsnittliga antalet samtidiga anrop, inte antalet virtuella användare eller systemets maximala kapacitet.
 
 ### Teoretisk kapacitet
-För att uppskatta svarstiden används antaganden om både CPU-bunden bearbetning och I/O-väntan. I projektet förväntas bcrypt-hashning utgöra en betydande del av den CPU-bundna bearbetningen. Med den valda kostnadsfaktorn uppskattas hashningstiden till cirka 0,1 s per anrop. Därutöver uppskattas den sammanlagda I/O-väntan, exempelvis för nätverkskommunikation och databasanrop, till cirka 0,05 s. Den uppskattade totala svarstiden blir därmed 0,15 s per anrop.
+För att uppskatta svarstiden används antaganden om både CPU-bunden bearbetning och I/O-väntan. I projektet förväntas bcrypt-hashning utgöra en betydande del av den CPU-bundna bearbetningen. Med den valda kostnadsfaktorn uppskattas hashningstiden till cirka 0,1 sekunder per anrop. Därutöver uppskattas den sammanlagda I/O-väntan, exempelvis för nätverkskommunikation och databasanrop, till cirka 0,05 sekunder Den uppskattade totala svarstiden blir därmed 0,15 sekunder per anrop.
 
-Eftersom bcrypt-hashningen är CPU-bunden förväntas den begränsa systemets maximala genomströmning. Med en uppskattad CPU-tid på 0,1 s per hashning kan en CPU-kärna hantera maximalt 10 hashningar per sekund. Med fyra CPU-kärnor blir den teoretiska maximala genomströmningen därmed 40 anrop per sekund:
+Eftersom bcrypt-hashningen är CPU-bunden förväntas den begränsa systemets maximala genomströmning. Med en uppskattad CPU-tid på 0,1 sekunder per hashning kan en CPU-kärna hantera maximalt 10 hashningar per sekund. Med fyra CPU-kärnor blir den teoretiska maximala genomströmningen därmed 40 anrop per sekund:
 
-$\lambda_{max} = \frac{4}{0,1} = 40\ \text{anrop/s}$
+$$\lambda_{max} = \frac{4}{0,1} = 40\ \text{anrop/s}$$
 
-Utifrån en genomsnittlig total svarstid på 0,15 s kan den uppskattade belastningen vid denna genomströmning beräknas med Littles sats:
+Utifrån en genomsnittlig total svarstid på 0,15 sekunder kan den uppskattade belastningen vid denna genomströmning beräknas med Littles sats:
 
 $$N = 40 \times 0,15 = 6\ \text{anrop i systemet}$$
 
-Detta innebär att i genomsnitt sex anrop befinner sig i systemet vid en genomströmning på 40 anrop per sekund och en genomsnittlig svarstid på 0,15 s. Beräkningen beskriver det förväntade antalet samtidiga anrop som systemet uppskattas kunna hantera.
+Detta innebär att i genomsnitt sex anrop befinner sig i systemet vid en genomströmning på 40 anrop per sekund och en genomsnittlig svarstid på 0,15 sekunder. Beräkningen beskriver det förväntade antalet samtidiga anrop som systemet uppskattas kunna hantera.
 
 ### Uppskattning av antal användare
 För att uppskatta hur många virtuella Locust-användare som krävs för att generera omkring 40 anrop per sekund beräknas den genomsnittliga tiden för hela anropscykeln. Varje användare antas skicka ett anrop, invänta svaret och därefter vänta mellan 1 och 3 sekunder innan nästa anrop skickas.
 
-Med en uppskattad svarstid på 0,15 sekunder och en genomsnittlig väntetid på 2 sekunder blir totaltiden för anropscykeln:
-
-$$ T = 0,15 + frac{1 + 3}{2} = 2,15s $$
+Med en uppskattad svarstid på 0,15 sekunder och en genomsnittlig väntetid på 2 sekunder blir den totala tiden för anropscykeln 2,15 sekunder.
 
 Det genomsnittliga antalet anrop per sekund och användare uppskattas därmed till:
 
 $$X_användare = \frac{1}{2,15} \approx 0,465\ anrop/s$$
 
-Antalet virtuella användare som teoretiskt krävs för att generera 40 anrop per sekund blir:
+Antalet virtuella användare som teoretiskt krävs för att generera 40 anrop per sekund blir därmed:
 
 $$N = \frac{40}{0,465} \approx 86\ \text{användare}$$
 
-Detta ger en teoretisk uppskattning på cirka 86 virtuella användare för att nå den beräknade genomströmningen om 40 anrop/s. Uppskattningen förutsätter att svarstiden förblir 150 ms även vid denna belastning och att varje användare skickar ett anrop per cykel.
+Detta ger en teoretisk uppskattning på cirka 86 virtuella användare för att nå den beräknade genomströmningen om 40 anrop per sekund.
 
 ### Val av belastningsnivåer
 Med utgångspunkten att 86 samtidiga användare är den teoretiskt optimala belastningen, definieras belastnings-nivåerna nedan:
-- Låg belastning: 10 användare
+- Låg belastning: 6 användare
 - Optimal belastning: 86 användare
 - Hög belastning: 100 användare
 - Överbelastning: 200 användare
