@@ -147,11 +147,11 @@ För att se hur systemet påverkas av belastning, utförs testerna under fyra be
 Inför mätningarna görs en teoretisk överslagsberäkning för att uppskatta vid vilken belastning systemet kan förväntas nå sin kapacitetsgräns. Beräkningen baseras på den uppskattade CPU-tiden för bcrypt-hashning, antalet tillgängliga CPU-kärnor och Littles sats. Syftet är att få en teoretisk referens för val av belastningsnivåer och förväntad systemkapacitet. Efter mätningarna jämförs uppskattningen med de uppmätta svarstiderna och genomströmningen, för att undersöka hur väl beräkningen överensstämmer med systemets faktiska beteende.
 
 ### Littles sats
-För att uppskatta antalet samtidiga anrop används Littles sats, som beskriver sambandet mellan genomströmning, svarstid och det genomsnittliga antalet anrop i systemet:
+För att uppskatta antalet samtidiga användare som skickar anrop används Littles sats, som beskriver sambandet mellan genomströmning, svarstid och det genomsnittliga antalet anrop:
 
 $$N= \lambda \times W $$
 
-Där ($N$) är det genomsnittliga antalet anrop i systemet, ($\lambda$) är genomströmningen i anrop per sekund och ($W$) är den genomsnittliga tiden ett anrop tillbringar i systemet. Resultatet beskriver alltså det genomsnittliga antalet samtidiga anrop som systemet hanterar.
+Där ($N$) är det genomsnittliga antalet användare i systemet, ($\lambda$) är genomströmningen i anrop per sekund och ($W$) är den genomsnittliga tiden ett anrop tillbringar i systemet. Resultatet beskriver alltså det genomsnittliga antalet samtidiga anrop som systemet hanterar.
 
 ### Teoretisk kapacitet
 Eftersom bcrypt-hashningen är CPU-bunden förväntas den begränsa systemets maximala genomströmning. Med en uppskattad CPU-tid på 0,1 sekunder per hashning kan en CPU-kärna hantera maximalt 10 hashningar per sekund. Med fyra CPU-kärnor blir den teoretiska maximala genomströmningen därmed 40 anrop per sekund:
@@ -189,16 +189,36 @@ Datan som loggas i Locust är:
 - Namn på route som anrop skickas till
 - Svarstid, alltså tiden från att anropet skickats till att svar kommer tillbaka
 - Eventuella exceptions
+
+Nginx har konfigurerats för att logga webbserverns inbyggda tidsvariabler för varje route i JSON-format, tillsammans med tidsstämpel och anrops-id som följer med från Locust. Följande data loggas i Nginx: 
+- Upstream Connect ms: tiden i millisekunder för att upprätta en nätverksanslutning mellan Nginx och Gunicorn
+- Upstream Header ms: tiden i millisekunder för att ta emot den allra första byten av HTTP-headern med svaret från Gunicorn, inkluderat exekveringstiden för Flask
+- Upstream Response ms: tiden i millisekunder för att ta emot hela svaret från Gunicorn, inkluderat exekveringstiden för Flask, från första anslutnignen, till att hela svaret har mottagits
+- Request ms: den totala tiden i millisekunder för anropet att hanteras av Nginx, från att anropet ankommer till Nginx till att svaret skickas tillbaka.
   
 För login-applikationen loggas den totala tiden för att exekvera varje route med Python-biblioteket logger. Loggarna sparas till en jsonl-fil. För login-routen loggas utöver den totala tiden för att exekvera routen även följande data:
 - Tid för att göra SELECT-anrop till databasen
 - Tid för att göra UPDATE-anrop till databasen
 - Tider för att ansluta till databas-pool för SELECT och UPDATE-anrop
-- Tid för att verifiera hashat lösenord med Bcrypt
+- Tid för att verifiera hashat lösenord med Bcrypt.
 
 Log-filerna sparas till logs-katalogen på host-enheten och data-katalogen i containern.
 
 ## Resursmätning
+För att mäta resursutnyttjande på de tre maskinerna används dedikerade Bash-skript. Skripten extraherar prestandadata direkt från Linux kontrollgrupper (cgroups) för varje container, samt från världssystemets globala räknare i /proc. 
+
+Cgroups (Control Groups) är en funktion i Linux-kärnan som isolerar och övervakar resursutnyttjandet för specifika processgrupper, vilket i detta projekt används för att extrahera CPU- och minnesdata för varje enskild Docker-container. Det virtuella filsystemet /proc fungerar som ett gränssnitt direkt mot Linux-kärnan, och används här för att samla in prestandaräknare för värddatorns systemhälsa.
+
+Mätdata samlas in vid två tidpunkter, för att isolera testets stabila fas. Det första stickprovet tas direkt efter att uppvärmningsfasen är slutförd, och antalet samtidiga användare har uppnåtts. Det andra stickprovet tas precis innan nedtrappningen av användare påbörjas.
+
+Genom att beräkna skillnaden mellan det slutliga och det inledande stickprovet fås ett mått på resursförbrukningen under den stabila mätperioden. Utifrån detta mått beräknas systemets nyttjandegrad ($\rho$) enligt följande formel:
+
+$$\rho = frac{Uppmätt CPU-tid}{Mätperiodens längd \times Antal CPU-kärnor}$$
+
+Datainsamlingen för resursutnyttjande är automatiserad via den Ansible-playbook kör testerna, och triggar Bash-skripten vid uppvärmningens slut samt vid testets slut. Skripten skriver sedan resursdata direkt till json-filer med tillhörande tidsstämplar. 
+
+## Sekvensdiagram med mätpunkter
+<BILD MED DATAPUNKTER>	
 
 
 # Visualisering av inloggning
