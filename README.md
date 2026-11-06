@@ -136,7 +136,7 @@ För att genomföra belastningtesterna används en separat Ansible-playbook: run
 
 Genom att uppdatera dessa parametrar kan systemet utvärderas utifrån de fyra belastningsnivåer som beskrivs nedan. För att få minimera effekter av outlier-värden och få tillförlitliga genomsnittsvärden för genomströmning och svarstider, upprepas testkörningarna för varje belastningsnivå tre gånger. 
 
-## Locust webbgränssnitt för att ange antal användare och körningstid
+## Locust webbgränssnitt
 ![Locust UI](locust_ui.png)
 
 
