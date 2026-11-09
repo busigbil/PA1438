@@ -2,7 +2,7 @@
 Detta projekt har skapats för kursen PA1438 på BTH. Syftet är att modellera de väntetider som en användare kan uppleva då många samtidiga användare kan logga in, och var dessa väntetider kan uppträda.
 
 ## Visualisering av inloggning
-![Login app](login_formv2.gif)
+![Login app](imgs/login_formv2.gif)
 
 Projektet innehåller filer för att sätta upp en enkel login-applikation, belasta applikationen med samtidiga användare som loggar in, samt mäta svarstider och resursbelastningen.
 
