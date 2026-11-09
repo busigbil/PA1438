@@ -1,6 +1,7 @@
 # docker-compose.yml
 services:
   db:
+    container_name: database
     image: postgres:14
     environment:
       POSTGRES_DB: users_db
@@ -11,16 +12,17 @@ services:
     volumes:
       - pgdata:/var/lib/postgresql/data
       - ./../../Database/schema.sql:/docker-entrypoint-initdb.d/schema.sql
+      - ./logs/database:/data
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 5s
-      timeout: 3s
+      timeout: 5s
       retries: 10
   
   seed:
-    image: busigbil/database:latest
-    depends_on:
-      db:
+    image: busigbil/database:latest 
+    depends_on: 
+      db: 
         condition: service_healthy
 
 volumes:
