@@ -70,19 +70,22 @@ sudo apt install software-properties-common
 sudo add-apt-repository --yes --update ppa:ansible/ansible
 sudo apt install ansible
 ```
-Kontrollera att Ansible har installerats korrekt:
+
+Installera se samlingar som playbooks behöver:
+```console
+ansible-galaxy collection install community.general community.docker
+```
+Verifiera att allt har instalelrats korrekt:
 ```console
 ansible --version
-```
-Installera Ansible collection, för att kunna köra Ansible-playbooks som finns i katalogen:
-```console
-ansible-galaxy collection install community.general
-```
-Verifiera att Ansible collection har installerats:
-```console
 ansible-galaxy collection list
 ```
-För att kunna köra Ansible-playbooks ska korrekta IP-adresser till maskinerna anges i filen inventory.yml
+För att kunna köra Ansible-playbooks behöver SSH och autentisering vara konfigurerade för fjärrmaskinerna, samt ska korrekta IP-adresser till maskinerna anges i filen inventory.yml  
+
+Testa att Ansible når maskinerna genom att köra: 
+```console
+ansible all -i inventory.yml -m ping
+```
 
 ## Docker 
 Docker Engine är en container-teknologi som möjliggör för att köra en applikation och alla dess beroenden inom en isolerad miljö (container). Projektet förutsätter att Docker Engine finns installerat på alla maskiner, eftersom alla delar körs i Docker-containrar. 
@@ -95,8 +98,7 @@ ansible-playbook -i inventory install-docker.yml
 ```
 Verifiera att Docker har installerats korrekt:
 ```console
-docker --version
-docker compose version
+ansible all -i inventory.yml -m command -a "docker compose version"
 ```
 
 I katalogen för Deploy finns docker-compose-filer för att starta projektet på tre separata maskiner. Alla docker-compose-filer utgår från existerande publika Docker-images. Nya Docker-images kan byggas utifrån de Docker-filer som finns i respektive katalog för App, Database, Locust. I maskinen som kör applikationen ska separata Docker-containrar köras för Nginx och en för Gunicorn + Flask. För att kunna köra projektet behöver korrekta IP-adresser för varje host anges som environment-variablar i respektive fil.
@@ -110,9 +112,14 @@ Installera Chrony genom att köra Ansible-playbook:
 ```console
 ansible-playbook -i inventory install-chrony.yml
 ```
-Kontrollera att tjänsten chronyd är aktiv:
+Kontrollera att tjänsten chrony är aktiv:
 ```console
-systemctl status chronyd
+systemctl status chrony
+```
+Verifiera tidssynkroniseringen:
+```console
+chronyc tracking
+chronyc sources -v
 ```
 
 ## Distributed Passive Measurement Infrastructure
