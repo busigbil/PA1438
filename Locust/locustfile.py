@@ -22,7 +22,7 @@ def load_users():
     rows = cursor.fetchall()
     cursor.close()
     conn.close()
-    return [row[0] for row in rows]
+    return [row[0] for row in rows] # list comprehension, take first column in returned list of rows.
 
 
 HOST_URL = os.environ.get("HOST_URL", "http://localhost:5000")
@@ -43,10 +43,8 @@ class LoginUser(HttpUser):
     def login(self):
         request_id = str(uuid.uuid4())
         headers = {"X-Request-ID": request_id}
-        start_time = time.time()
 
         context = {
-            "start_time": start_time,
             "request_id": request_id,
         }
 
@@ -111,10 +109,9 @@ results = []
 def on_request(request_type, name, response_time, response_length, response,
                context, exception, start_time, **kwargs):
     """
-    Event handler that get triggered on every request.
+    Data is added to results-list on each request.
     """
     results.append({
-        "timestamp": context.get("start_time"),
         "start_time": start_time,
         "request_id": context.get("request_id"),
         "path": name,
@@ -126,8 +123,7 @@ def on_request(request_type, name, response_time, response_length, response,
 @events.report_to_master.add_listener
 def on_report_to_master(client_id, data):
     """
-    This event is triggered on the worker instances every time results
-    to be sent to the locust master.
+    List with request data is sent to Locust master.
     """
     data["results"] = results.copy()
     results.clear()
@@ -136,8 +132,7 @@ def on_report_to_master(client_id, data):
 @events.worker_report.add_listener
 def on_worker_report(client_id, data):
     """
-    This event is triggered on the master instance when new results arrives
-    from a worker.
+    Locust master receives request data from workers and writes to json-file.
     """
     batch = data["results"]
     if not batch:
@@ -150,7 +145,7 @@ def on_worker_report(client_id, data):
 @events.test_stop.add_listener
 def save_remaining(environment, **kwargs):
     """
-    Write last results to file when test ends.
+    Last results are written to json-file when test ends.
     """
     is_worker = environment.parsed_options and getattr(environment.parsed_options, "worker", False)
     if is_worker or not results:
