@@ -12,7 +12,7 @@ Projektet är uppdelat i:
 - Databasen med användarens uppgifter, som används både av applikationen och Locust-skriptet.
 
 ## Sekvensdiagram för projektet
-![sekvensdiagram](sekvensdiagramV2.png)
+![sekvensdiagram](imgs/sekvensdiagramV2.png)
 
 ## Login-app
 Login-applikationen har byggts i Flask, och innehåller router för index, login och home:
@@ -149,7 +149,7 @@ ansible-playbook run-test.yml -e "run_id=test_001"
 ```
 
 ## Locust webbgränssnitt
-![Locust UI](locust_ui.png)
+![Locust UI](imgs/locust_ui.png)
 
 
 ## Belastningsnivåer
@@ -239,7 +239,7 @@ Datainsamlingen för resursutnyttjande är automatiserad via den Ansible-playboo
 ...
 
 ## Sekvensdiagram med mätpunkter
-![Sequence diagram with measurement points](measure_diagram.png)
+![Sequence diagram with measurement points](imgs/measure_diagram.png)
 
 
 
