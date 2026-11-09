@@ -1,0 +1,162 @@
+- name: Check test has stopped
+  hosts: locust
+  tasks:
+    - name: Wait till Locust test has status stopped
+      ansible.builtin.uri:
+        url: "http://{{ hostvars['locust']['ansible_host'] }}:8089/stats/requests"
+        method: GET
+        return_content: yes
+        timeout: 10
+      register: data
+      until: data.json.state == 'stopped'
+      retries: 360
+      delay: 5
+
+- name: Create local directory for results
+  hosts: localhost
+  connection: local
+  tasks:
+    - name: Create directories
+      ansible.builtin.file:
+        path: "{{ playbook_dir }}/results/{{ run_id }}"
+        state: directory
+        mode: "0755"
+      loop:
+        - locust
+        - app
+        - nginx
+        - database
+
+- name: Fetch Locust logs
+  hosts: locust
+  tasks:
+    - name: Fetch locust timing data
+      ansible.builtin.fetch:
+        src: "/opt/locust/logs/locust/locust_log.jsonl"
+        dest: "{{ playbook_dir }}/results/{{ run_id }}/locust/"
+        flat: true
+
+    - name: Fetch locust html-report
+      ansible.builtin.fetch:
+        src: "/opt/locust/logs/locust/locust_report.html"
+        dest: "{{ playbook_dir }}/results/{{ run_id }}/locust/"
+        flat: true
+
+    - name: Find locust cgroup files
+      ansible.builtin.find:
+        paths: "/opt/locust/logs/locust/metrics/{{ run_id }}"
+        patterns: "*.json"
+        file_type: file
+      register: cgroup
+
+    - name: Fetch Locust cgroup data
+      ansible.builtin.fetch:
+        src: "{{ item.path }}"
+        dest: "{{ playbook_dir }}/results/{{ run_id }}/locust/"
+        flat: true
+      loop: "{{ cgroup.files }}"
+
+    - name: Find locust proc files
+      ansible.builtin.find:
+        paths: "/var/tmp/proc-stats/{{ run_id }}"
+        patterns: "*.json"
+        file_type: file
+      register: proc
+
+    - name: Fetch Locust proc data
+      ansible.builtin.fetch:
+        src: "{{ item.path }}"
+        dest: "{{ playbook_dir }}/results/{{ run_id }}/locust/"
+        flat: true
+      loop: "{{ proc.files }}"
+
+- name: Fetch app logs
+  hosts: app
+  tasks:
+    - name: Fetch app timing data
+      ansible.builtin.fetch:
+        src: "/opt/app/logs/app/app_log.jsonl"
+        dest: "{{ playbook_dir }}/results/{{ run_id }}/app/"
+        flat: true
+
+    - name: Find app cgroup files
+      ansible.builtin.find:
+        paths: "/opt/app/logs/app/metrics/{{ run_id }}"
+        patterns: "*.json"
+        file_type: file
+      register: cgroup
+
+    - name: Fetch app cgroup data
+      ansible.builtin.fetch:
+        src: "{{ item.path }}"
+        dest: "{{ playbook_dir }}/results/{{ run_id }}/app/"
+        flat: true
+      loop: "{{ cgroup.files }}" 
+
+    - name: Find app proc files
+      ansible.builtin.find:
+        paths: "/var/tmp/proc-stats/{{ run_id }}"
+        patterns: "*.json"
+        file_type: file
+      register: proc
+
+    - name: Fetch app proc data
+      ansible.builtin.fetch:
+        src: "{{ item.path }}"
+        dest: "{{ playbook_dir }}/results/{{ run_id }}/app/"
+        flat: true
+      loop: "{{ proc.files }}"
+
+- name: Fetch nginx logs
+  hosts: app
+  tasks:  
+    - name: Fetch nginx timing data
+      ansible.builtin.fetch:
+        src: "/opt/nginx/logs/nginx/access.jsonl"
+        dest: "{{ playbook_dir }}/results/{{ run_id }}/nginx/"
+        flat: true
+
+    - name: Find nginx cgroup files
+      ansible.builtin.find:
+        paths: "/opt/nginx/logs/nginx/metrics/{{ run_id }}"
+        patterns: "*.json"
+        file_type: file
+      register: cgroup
+
+    - name: Fetch nginx cgroup data
+      ansible.builtin.fetch:
+        src: "{{ item.path }}"
+        dest: "{{ playbook_dir }}/results/{{ run_id }}/nginx/"
+        flat: true
+      loop: "{{ cgroup.files }}" 
+    
+- name: Fetch database logs
+  hosts: database
+  tasks:
+    - name: Find database cgroup files
+      ansible.builtin.find:
+        paths: "/opt/db/logs/database/metrics/{{ run_id }}"
+        patterns: "*.json"
+        file_type: file
+      register: cgroup
+
+    - name: Fetch database cgroup data
+      ansible.builtin.fetch:
+        src: "{{ item.path }}"
+        dest: "{{ playbook_dir }}/results/{{ run_id }}/database/"
+        flat: true
+      loop: "{{ cgroup.files }}"
+
+    - name: Find database proc files
+      ansible.builtin.find:
+        paths: "/var/tmp/proc-stats/{{ run_id }}"
+        patterns: "*.json"
+        file_type: file
+      register: proc
+
+    - name: Fetch database proc data
+      ansible.builtin.fetch:
+        src: "{{ item.path }}"
+        dest: "{{ playbook_dir }}/results/{{ run_id }}/database/"
+        flat: true
+      loop: "{{ proc.files }}"

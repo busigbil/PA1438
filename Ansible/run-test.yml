@@ -1,0 +1,115 @@
+- name: Start load test
+  hosts: locust
+  tasks:
+    - name: Start test run from Locust web UI
+      ansible.builtin.uri:
+        url: "http://{{ hostvars['locust']['ansible_host'] }}:8089/swarm"
+        method: POST
+        body:
+          user_count: 300
+          spawn_rate: 10
+          run_time: 10m30s
+        body_format: form-urlencoded
+        status_code: 200
+
+- name: Check test has started
+  hosts: locust
+  tasks:
+    - name: Check that Locust test has status running
+      ansible.builtin.uri:
+        url: "http://{{ hostvars['locust']['ansible_host'] }}:8089/stats/requests"
+        method: GET
+        return_content: yes
+        timeout: 10
+      register: data
+      until: "data.json.state == 'running'"
+      retries: 360
+      delay: 5
+
+- name: Collect cgroup-stats at start (nginx and gunicorn)
+  hosts: app
+  vars:
+    containers:
+      - nginx
+      - gunicorn
+  tasks:
+    - name: Run cgroup script in each container
+      ansible.builtin.command:
+        argv:
+          - docker
+          - exec
+          - "{{ item }}"
+          - bash
+          - /scripts/cgroup.bash
+          - "{{ run_id }}"
+      loop: "{{ containers }}"
+
+- name: Collect cgroup-stats at start (database)
+  hosts: database
+  tasks:
+    - name: Run cgroup script in container
+      ansible.builtin.command:
+        argv:
+          - docker
+          - exec
+          - database
+          - bash
+          - /scripts/cgroup.bash
+          - "{{ run_id }}"
+
+- name: Collect proc-stats at start
+  hosts: "locust,app,database"
+  tasks:
+    - name: Run proc-script on all machines
+      ansible.builtin.script: /scripts/proc.bash
+
+- name: Check test is stopping
+  hosts: locust
+  tasks:
+    - name: Check that Locust test has status stopping
+      ansible.builtin.uri:
+        url: "http://{{ hostvars['locust']['ansible_host'] }}:8089/stats/requests"
+        method: GET
+        return_content: yes
+        timeout: 10
+      register: data
+      until: data.json.state == 'stopping'
+      retries: 360
+      delay: 5
+
+- name: Collect cgroup-stats at end (nginx and gunicorn)
+  hosts: app
+  vars:
+    containers:
+      - nginx
+      - gunicorn
+  tasks:
+    - name: Run cgroup script in each container
+      ansible.builtin.command:
+        argv:
+          - docker
+          - exec
+          - "{{ item }}"
+          - bash
+          - /scripts/cgroup.bash
+          - "{{ run_id }}"
+      loop: "{{ containers }}"
+
+- name: Collect cgroup-stats at end (database)
+  hosts: database
+  tasks:
+    - name: Run cgroup script in container
+      ansible.builtin.command:
+        argv:
+          - docker
+          - exec
+          - database
+          - bash
+          - /scripts/cgroup.bash
+          - "{{ run_id }}"
+
+- name: Collect proc-stats at end
+  hosts: "locust,app,database"
+  tasks:
+    - name: Run proc-script on all machines
+      ansible.builtin.script: /scripts/proc.bash

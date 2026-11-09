@@ -1,0 +1,57 @@
+- name: Deploy database
+  hosts: database
+  tasks:
+    - name: Copy compose file
+      ansible.builtin.copy:
+        src: ../Deploy/Database/docker-compose.yml
+        dest: /opt/db/
+
+    - name: Start database container
+      community.docker.docker_compose_v2:
+        project_src: /opt/db
+        state: present
+
+    - name: Wait for database to be ready
+      ansible.builtin.wait_for:
+        port: 5432
+        delay: 10
+        timeout: 600
+
+- name: Deploy application
+  hosts: app
+  tasks:
+    - name: Copy compose file
+      ansible.builtin.copy:
+        src: ../Deploy/App/docker-compose.yml
+        dest: /opt/app/
+
+    - name: Start app container
+      community.docker.docker_compose_v2:
+        project_src: /opt/app
+        state: present
+
+- name: Deploy nginx
+  hosts: app
+  tasks:
+    - name: Copy compose file
+      ansible.builtin.copy:
+        src: ../Deploy/Nginx/docker-compose.yml
+        dest: /opt/nginx/
+
+    - name: Start nginx container
+      community.docker.docker_compose_v2:
+        project_src: /opt/nginx
+        state: present
+
+- name: Deploy Locust
+  hosts: locust
+  tasks:
+    - name: Copy compose file
+      ansible.builtin.copy:
+        src: ../Deploy/Locust/docker-compose.yml
+        dest: /opt/locust/
+
+    - name: Start locust container
+      community.docker.docker_compose_v2:
+        project_src: /opt/locust
+        state: present

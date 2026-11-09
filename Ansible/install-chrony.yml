@@ -1,0 +1,57 @@
+- name: Install Chrony on Ubuntu
+  hosts: all
+  become: true
+
+  handlers:
+    - name: Restart chrony
+      ansible.builtin.systemd:
+        name: chrony
+        state: restarted
+
+  tasks:
+    - name: Update apt cache and install chrony
+      ansible.builtin.apt:
+        name: chrony
+        update_cache: yes
+        state: present
+      
+    - name: Configure Chrony master
+      block:
+      - name: Configure master as local NTP-server
+        ansible.builtin.blockinfile:
+          path: /etc/chrony/chrony.conf
+          block: |
+            pool pool.ntp.org iburst
+            allow {{ chrony_allowed_network }}
+            local stratum 10 master
+        notify: Restart chrony
+    
+      - name: Allow NTP traffic through UFW firewall on Master
+        community.general.ufw:
+          rule: allow
+          port: "123"
+          proto: udp
+      when: chrony_role == 'master'
+      
+    - name: Configure Chrony Clients
+      block:
+        - name: Comment out default internet pools on clients
+          ansible.builtin.replace:
+            path: /etc/chrony/chrony.conf
+            regexp: '^(pool|server) .*'
+            replace: '# \g<0>'
+          notify: Restart chrony
+
+        - name: Point clients to the local master with iburst
+          ansible.builtin.lineinfile:
+            path: /etc/chrony/chrony.conf
+            line: "server {{ groups['locust'][0] }} iburst"
+            insertafter: EOF
+          notify: Restart chrony
+      when: chrony_role == 'client'
+
+    - name: Ensure Chrony is enabled and started
+      ansible.builtin.systemd:
+        name: chrony
+        state: started
+        enabled: yes

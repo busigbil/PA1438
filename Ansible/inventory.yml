@@ -1,0 +1,13 @@
+locust:
+  hosts:
+    <IP-adress>:
+      chrony_role: master
+      chrony_allowed_network: <CIDR-block>
+app:
+  hosts:
+    <IP-adress>:
+      chrony_role: client
+database:
+  hosts:
+    <IP-adress>:
+      chrony_role: client
