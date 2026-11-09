@@ -1,9 +1,12 @@
 # docker-compose.yml
-services:
   locust:
+    container_name: locust
     image: busigbil/locust:latest
     ports:
       - "8089:8089"
+    volumes:
+      - ./logs/locust:/data
     environment:
-      HOST_URL: http://localhost:5000
-      DATABASE_HOST: localhost
+      HOST_URL: "http://nginx:80"
+      DATABASE_HOST: <databasvärdens IP>
+      LOCUST_HTML: "/data/locust_report.html"
