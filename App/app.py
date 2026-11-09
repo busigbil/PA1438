@@ -19,7 +19,6 @@ logger.propagate = False
 logfile = os.path.abspath('/data/app_log.jsonl')
 rotateHandler = ConcurrentRotatingFileHandler(logfile, "a", 512*1024, 5)
 
-# handler = logging.FileHandler('/data/app_log.jsonl')
 rotateHandler.setFormatter(JsonFormatter("%(asctime)s %(levelname)s"))
 logger.addHandler(rotateHandler)
 
@@ -28,14 +27,25 @@ logger.addHandler(rotateHandler)
 
 @app.before_request
 def before_request():
-    g.start_time = time.monotonic()
+    """
+    Before each request is handled, the request's 
+    timestamps and request ID are recorded in Flask's g-object, 
+    which makes them available for the current request.
+    """
+
+    g.start_time = time.perf_counter()
     g.timestamp = time.time()
     g.request_id = request.headers.get("X-Request-ID", str(uuid.uuid4()))
 
 
 @app.after_request
 def log_request(response):
-    duration_ms = round((time.monotonic() - g.start_time) * 1000, 3)
+    """
+    After each request is handled, information about the request 
+    and the calculated duration times are added to the log-file.
+    """
+
+    duration_ms = round((time.perf_counter() - g.start_time) * 1000, 3)
     logger.info({
         "timestamp": g.timestamp,
         "request_id": g.request_id,
@@ -65,7 +75,7 @@ def home():
             "request_id": g.request_id,
             "event": "home_failed",
         })
-        return redirect(url_for('index'))
+        return redirect(url_for('index')), 307
 
     html = render_template('home.html', name=session.get("name"))
     return html, 200
@@ -74,7 +84,7 @@ def home():
 @app.route('/login', methods=['POST'])
 def login():
     """
-    Perform login functions and log data from individual parts.
+    Perform login functions and log the data from individual parts.
     """
     username = request.form.get("username")
     password = request.form.get("password")
@@ -98,13 +108,13 @@ def login():
         return jsonify({"error": "Not found"}), 404
 
     # Bcrypt log timing
-    bcrypt_start = time.monotonic()
+    bcrypt_start = time.perf_counter()
     stored_hash = user_row[3]
     password_ok = bcrypt.checkpw(
         password.encode(),
         stored_hash.encode()
     )
-    bcrypt_ms = round((time.monotonic() - bcrypt_start) * 1000, 3)
+    bcrypt_ms = round((time.perf_counter() - bcrypt_start) * 1000, 3)
 
     if not password_ok:
         logger.error({
@@ -135,9 +145,10 @@ def login():
         "update_wait_ms": update_wait_ms,
         "update_query_ms": update_query_ms,
     })
-    return redirect(url_for('home')), 302
+    return redirect(url_for('home')), 303
 
 
-@app.route('/health', methods=['GET'])
+@app.route('/health')
 def health():
-    return jsonify({"status": "ok", "service": "app"}), 200
+    """Route to check if service is up."""
+    return 'OK', 200
