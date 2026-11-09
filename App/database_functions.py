@@ -5,8 +5,8 @@ import time
 
 # Database connection configuration
 connection_pool = psycopg2.pool.ThreadedConnectionPool(
-    minconn=1,
-    maxconn=10,
+    minconn=24,
+    maxconn=24,
     database="users_db",
     user="postgres",
     password="postgres",
@@ -18,17 +18,21 @@ connection_pool = psycopg2.pool.ThreadedConnectionPool(
 def get_connection():
     return connection_pool.getconn()
 
-
 def release_connection(connection):
     connection_pool.putconn(connection)
 
+def calc_time(timing):
+    return round((time.perf_counter() - timing) * 1000, 3)
+
+
 
 def get_user_from_db(username):
-    pool_start = time.monotonic()
+    """Connect to the database and fetch user information."""
+    pool_start = time.perf_counter()
     conn = get_connection()
-    pool_ms = round((time.monotonic() - pool_start) * 1000, 3)
+    pool_ms = calc_time(pool_start)
 
-    query_start = time.monotonic()
+    query_start = time.perf_counter()
     try:
         with conn.cursor() as cursor:
             cursor.execute(
@@ -49,17 +53,19 @@ def get_user_from_db(username):
         # close db connection
         cursor.close()
         release_connection(conn)
-    query_ms = round((time.monotonic() - query_start) * 1000, 3)
+    query_ms = calc_time(query_start)
 
     return row, pool_ms, query_ms
 
 
 def update_timestamp_db(user_id):
-    pool_start = time.monotonic()
+    """Connect to the database and update user record with login-timestamp."""
+    
+    pool_start = time.perf_counter()
     conn = get_connection()
-    pool_ms = round((time.monotonic() - pool_start) * 1000, 3)
+    pool_ms = calc_time(pool_start)
 
-    query_start = time.monotonic()
+    query_start = time.perf_counter()
     try:
         with conn.cursor() as cursor:
             cursor = conn.cursor()
@@ -75,6 +81,6 @@ def update_timestamp_db(user_id):
         # close db connection
         cursor.close()
         release_connection(conn)
-    query_ms = round((time.monotonic() - query_start) * 1000, 3)
+    query_ms = calc_time(query_start)
 
     return pool_ms, query_ms
