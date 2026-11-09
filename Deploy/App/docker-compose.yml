@@ -1,10 +1,11 @@
 # docker-compose.yml
 services:
   app:
-      image: busigbil/app:latest
-      ports:
-        - "5000:5000"
-      volumes:
-        - ./logs:/data
-      environment: 
-        DATABASE_HOST: db
+    container_name: gunicorn
+    image: busigbil/app:latest
+    expose:
+      - 5000
+    volumes:
+      - ./logs/app:/data
+    environment: 
+      DATABASE_HOST: <databasvärdens IP>
