@@ -71,7 +71,7 @@ sudo add-apt-repository --yes --update ppa:ansible/ansible
 sudo apt install ansible
 ```
 
-Installera se samlingar som playbooks behöver:
+Installera de samlingar som playbooks behöver:
 ```console
 ansible-galaxy collection install community.general community.docker
 ```
