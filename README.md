@@ -191,7 +191,7 @@ Med utgångspunkten att 86 samtidiga användare är den teoretiskt optimala bela
 - Låg belastning: 6 användare
 - Optimal belastning: 86 användare
 - Hög belastning: 100 användare
-- Överbelastning: 200 användare
+- Överbelastning: 500 användare
 
 # Datainsamling
 Vid varje testkörning per belastningsnivå samlas data med loggade svarstider och resursanvändning in. Datan som samlas in beskrivs nedan.
@@ -234,6 +234,9 @@ Genom att beräkna skillnaden mellan det slutliga och det inledande stickprovet 
 $$\rho = \frac{\text{Uppmätt CPU-tid}}{\text{Mätperiodens längd x Antal CPU-kärnor}}$$
 
 Datainsamlingen för resursutnyttjande är automatiserad via den Ansible-playbook kör testerna, och triggar Bash-skripten vid uppvärmningens slut samt vid testets slut. Skripten skriver sedan resursdata direkt till json-filer med tillhörande tidsstämplar. 
+
+## Nätverksmätning
+...
 
 ## Sekvensdiagram med mätpunkter
 ![Sequence diagram with measurement points](measure_diagram.png)
