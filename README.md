@@ -128,13 +128,18 @@ Kör den Ansible-playbook som kopierar Docker-compose-filerna och startar contai
 ansible-playbook -i inventory deploy.yml
 ```
 
-För att genomföra belastningtesterna används en separat Ansible-playbook: run_test.yml. Denna playbook interagerar med Locust API via dess webbgränssnitt. IP-adressen till maskinen som kör Locust ska anges i anropssträngen. Testets belastningsprofil konfigureras i anropets payload med följande parametrar:
+För att genomföra belastningtesterna används en separat Ansible-playbook: run-test.yml. Denna playbook interagerar med Locust API via dess webbgränssnitt. IP-adressen till maskinen som kör Locust ska anges i anropssträngen. Testets belastningsprofil konfigureras i anropets payload med följande parametrar:
 
 - user_count: totala antalet samtidiga virtuella användare
 - spawn_rate: accelerationstakt (antal användare som läggs till per sekund under uppvärmningsfasen).
 - run_time: testets totala körtid, inklusive tiden för upptrappning och nedtrappning.
 
 Genom att uppdatera dessa parametrar kan systemet utvärderas utifrån de fyra belastningsnivåer som beskrivs nedan. För att få minimera effekter av outlier-värden och få tillförlitliga genomsnittsvärden för genomströmning och svarstider, upprepas testkörningarna för varje belastningsnivå tre gånger. 
+
+Uppdatera belastningsuppgifterna och kör Ansible playbook. Ange ett testid som används för att märka upp katalogen med testloggar för respektive körning:
+```console
+ansible-playbook run-test.yml -e "run_id=test_001"
+```
 
 ## Locust webbgränssnitt
 ![Locust UI](locust_ui.png)
@@ -184,6 +189,11 @@ Med utgångspunkten att 86 samtidiga användare är den teoretiskt optimala bela
 # Datainsamling
 Vid varje testkörning per belastningsnivå samlas data med loggade svarstider och resursanvändning in. Datan som samlas in beskrivs nedan.
 
+Kör Ansible playbook för att samla in testdata och spara till en katalog med samma test id som testkörningen:
+```console
+ansible-playbook fetch-logs.yml -e "run_id=test_001"
+```
+
 ## Loggning
 I Locust-skriptet loggas data för varje anrop som skickas, och sparas i en .jsonl fil. I Locust genereras ett anrops-id som följer med till loggningen i Login-applikationen, så att svarstiden i Locust kan jämföras med exekveringstiden för applikationen. 
 Datan som loggas i Locust är:
@@ -204,8 +214,6 @@ För login-applikationen loggas den totala tiden för att exekvera varje route m
 - Tid för att göra UPDATE-anrop till databasen
 - Tider för att ansluta till databas-pool för SELECT och UPDATE-anrop
 - Tid för att verifiera hashat lösenord med Bcrypt.
-
-Log-filerna sparas till logs-katalogen på host-enheten och data-katalogen i containern.
 
 ## Resursmätning
 För att mäta resursutnyttjande på de tre maskinerna används dedikerade Bash-skript. Skripten extraherar prestandadata direkt från Linux kontrollgrupper (cgroups) för varje container, samt från världssystemets globala räknare i /proc. 
