@@ -75,7 +75,7 @@ Installera de samlingar som playbooks behöver:
 ```console
 ansible-galaxy collection install community.general community.docker
 ```
-Verifiera att allt har instalelrats korrekt:
+Verifiera att allt har installerats korrekt:
 ```console
 ansible --version
 ansible-galaxy collection list
