@@ -8,3 +8,4 @@ services:
     volumes:
       - ./logs/nginx:/var/log/nginx
       - ./logs/nginx:/data
+      
