@@ -1,0 +1,10 @@
+# docker-compose.yml
+services:
+  nginx:
+    container_name: nginx
+    build: ./App/nginx
+    ports:
+      - "80:80"
+    volumes:
+      - ./logs/nginx:/var/log/nginx
+      - ./logs/nginx:/data
