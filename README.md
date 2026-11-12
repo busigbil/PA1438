@@ -51,7 +51,17 @@ Databasanslutningarna hanteras med hjälp av psycopg2-anslutningspool. En anslut
 Varje Gunicorn worker motsvarar en egen process, med en egen databaspool. Därför konfigureras databaspoolens storlek utifrån antalet trådar som varje worker har, det vill säga sex trådar. Med fyra workers innebär det att 4 * 6 = 24 anslutningar maximalt förväntas göras mot databasen samtidigt. 
 
 ## Hårdvara och nätverk
-...
+Projektet körs i Docker-containrar på tre maskiner: en maskin för Locust, en för Flask-applikationen, och en för databasen. Docker-containrarna har tillgång till följande hårdvara på värdmaskinerna: 
+- Locust-maskinen har en processor av modellen AMD Opteron 4386 med åtta kärnor och en tråd per kärna. Maskinen har 32 GB RAM, varav ca. 30 GiB är tillgängligt i Ubuntu. 
+- Applikationens maskin har en processor av modellen Intel Xeon E3-1220 V2, med fyra kärnor och en tråd per kärna. Maskinen har 8 GB RAM, varav 7,2 GiB är tillgängligt i Ubuntu.
+- Databasens maskin har en processor av modellen AMD Opteron 4334, med sex kärnor och en tråd per kärna. Maskinen har 32 GB RAM, varav ca. 30 GiB är tillgängligt i Ubuntu. 
+
+Alla maskiner är geografiskt placerade på Blekinge Tekniska Högskola och är uppsatta inom ett privat nätverk som nås genom en bastionserver. Trafiken routas från Locust-maskinen via applikationens maskin till databasens maskin genom två separata subnät. I applikationsmaskinen används VLAN-uppdelning på samma fysiska nätverksport för att separera trafiken mellan de två subnäten. 
+
+Alla maskiner är utrustade med gigabit-nätverkskort med full duplex. Maskinerna som kör Locust och applikationen har en länkhastighet på 100 Mbps, medan nätverkskortet på maskinen som kör databasen har en länkhastighet 1000 Mbps. Eftersom applikationsmaskinen delar bandbredd mellan inkommande och utgående trafik, innebär det i praktiken att den effektiva bandbredden är närmare 50 Mbps.
+
+Samtliga maskiner kör operativsystemet Ubuntu 26.04.1 LTS (64-bitars, x86_64) med Linux-kärna 7.0.0-43-generic.
+
 
 # Installation
 För att köra projektet behöver Docker och Chrony vara installerat på alla maskiner. Dessutom ska en DPMI-mätpunkt sättas upp, för att kunna mäta nätverkstrafiken. Nedan beskrivs hur Docker och Chrony kan installeras med hjälp av Ansible-playbooks, som finns tillgängliga i katalogen som heter Ansible.
