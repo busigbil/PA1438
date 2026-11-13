@@ -104,7 +104,7 @@ En utförlig beskrivning om hur Docker installeras på Ubuntu finns på: [Docker
 
 Installera Docker genom att köra den Ansible-playbook som installerar Docker och Docker compose på alla maskiner:
 ```console
-ansible-playbook -i inventory install-docker.yml
+ansible-playbook -i inventory.yml install-docker.yml
 ```
 Verifiera att Docker har installerats korrekt:
 ```console
@@ -120,7 +120,7 @@ Chrony är ett protokoll som bygger på Network Time Protocol (NTP), och använd
 
 Installera Chrony genom att köra Ansible-playbook:
 ```console
-ansible-playbook -i inventory install-chrony.yml
+ansible-playbook -i inventory.yml install-chrony.yml
 ```
 Kontrollera att tjänsten chrony är aktiv:
 ```console
@@ -142,7 +142,7 @@ Innan testkörningarna påbörjas, initieras systemmiljön genom att docker-comp
 
 Kör den Ansible-playbook som kopierar Docker-compose-filerna och startar containrarna: 
 ```console
-ansible-playbook -i inventory deploy.yml
+ansible-playbook -i inventory.yml deploy.yml
 ```
 
 För att genomföra belastningtesterna används en separat Ansible-playbook: run-test.yml. Denna playbook interagerar med Locust API via dess webbgränssnitt. IP-adressen till maskinen som kör Locust ska anges i anropssträngen. Testets belastningsprofil konfigureras i anropets payload med följande parametrar:
